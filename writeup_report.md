@@ -5,7 +5,7 @@
 **Advanced Lane Finding Project**
 
 #### Executive Summary:
-In this report, we investigate the process of building a lane finding pipeline which takes in a video stream and outputs a processed video. The processed video should include properties useful to self-driving vehicles such as lane identification, vehicle position, and lane curvature. We showed that such a pipeline can be accomplished using a combination of camera distortion correction, image thresholding, bird's-eye view perspective transform, and sliding-window sesuarch.
+In this report, we investigate the process of building a lane finding pipeline which takes in a video stream and outputs a processed video. The processed video should include properties useful to self-driving vehicles such as lane identification, vehicle position, and lane curvature. We showed that such a pipeline can be accomplished using a combination of camera distortion correction, image thresholding, bird's-eye view perspective transform, and sliding-window search.
 
 Outline of the report:
 1. Introduction
@@ -16,7 +16,7 @@ Outline of the report:
 6. Determine radius of curvature and vehicle position relative to lane lines
 7. Highlighting area between lanes
 8. Final output
-9. Summary
+9. Discussion
 10. Appendix
 
 [//]: # (Image References)
@@ -33,21 +33,16 @@ Outline of the report:
 [image10]:  ./output_images/Isolating2Filters.png "Isolating Filter Components.png"
 [image11]:  ./output_images/Perspective_Transformed.png "Perspective Transformed.png"
 [image12]:  ./output_images/Warped_Lines.png "Warped Lines.png"
-[image13]:  ./output_images/Searched_Lines.png "Searched Lines.png"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image13]:  ./output_images/Searched_Lines.png "Searched Lines.png"
 
 
 #### 1. Introduction
 
 The goal of this project is to implement a pipeline which could identify lane lines, calculate lane curvature, and vehicle position relative to lane centre in a video stream. First we calibrated the camera which the video was taken with in order to be able to correct for radial and tangential distortion. Undistorting the image is important since we would want to measure physical properties such as vehicle distance from centre, and lane radius of curvature from pixel positions.
 
-We next applied a series of image processing filters such as color space transform with threshold, gradient orientation filter, gradient angle filter, and magnitude filter to determine the best combination to clearly isolate the left and right lane lines.
+We next applied a series of image processing filters such as color space transform with threshold, gradient orientation filter, gradient angle filter, and magnitude filter to determine the best combination that clearly isolate the left and right lane lines.
 
-A bird's-eye-view perspective transform was then performed on the isolated lane lines. This step allowed us more accurately determine the direction of our lane curves. By using histogram frequency, we obtained a distribution of pixel location distribution. This information then enabled us to perform a form of sliding-window search that stacks vertically to collect left and right lanes pixels.
+A bird's-eye-view perspective transform was then performed on the isolated lane lines. This step allowed us to more accurately determine the direction of our lane curves. By using histogram frequency, we obtained a distribution of pixel location distribution. This information then enabled us to perform a form of sliding-window search that stacks vertically to collect left and right lanes pixels.
 
 We then fit a quadratic line to each of the left and right lane pixels. Using the fitted quadratic coefficients (both with and without conversion to physical distance), we could 1) highlight the area between lane lines, and 2) calculate radius of curvature.
 
@@ -55,7 +50,7 @@ All this was then unwarped and drawned over the input video frames to create a v
 
 #### 2. Camera calibration and distortion correction
 
-To calibrate our camera, we used chessboard images captured from the same camera used in the video. Chessboard images are particularly suited for calibration because regardless of how they show up on our camera images, we know that each grid edges should be straight lines. By mapping each of the chessboard corners (in 3 dimensional cartesian space) in the distored image to a 3 dimensional cartesian space with zeros in the z-axis and uniform grid distance, we could calculate our camera properties such as focal length, and distortion coefficients. We then used these information to undistort camera images. Below are examples of the impact of distortion correction:
+To calibrate our camera, we used chessboard images captured from the same camera used in the video. Chessboard images are particularly suited for calibration because regardless of how they show up on our camera images, we know that each grid edges should be straight lines. By mapping each of the chessboard corners (in 3 dimensional cartesian space) in the distorted image to a 3 dimensional cartesian space with zeros in the z-axis and uniform grid distance, we could calculate our camera properties such as focal length, and distortion coefficients. We then used these information to undistort camera images. Below are examples of the impact of distortion correction:
 
 ![alt text][image1]
 ![alt text][image2]
@@ -71,7 +66,7 @@ There were many possible ways for image thresholding. We investigated the follow
 4. Gradient strength (magnitude)
 5. Gradient angle
 
-The approach we used were convert input image into grayscale channel and activate only the pixels which correspond to the binary filters. The resulting image is then compared with the input image and with other combinations of binary filters to determine which best isolates the left and right lane lines. We use "bitwise and" and "bitwise or" to combine more than one binary filters. 
+The approach we used were convert input image into single channel and activate only the pixels which correspond to the binary filters. The resulting image is then compared with the input image and with other combinations of binary filters to determine which best isolates the left and right lane lines. We use "bitwise and" and "bitwise or" to combine more than one binary filters. 
 
 See the following functions in utils.py
 1. `Sobel_Binary`
@@ -97,7 +92,7 @@ Our experimentation with various combination did not result in better performanc
 
 #### 4. Perspective transform
 
-To transform to a bird's-eye-view perspective, we needed to map points roughly coresponding to left and right lane line endpoints to a rectangle vertices. This will stretch/shrink the image such that lane lines farther away in the input image appear in similar scale as nearer lane lines. 
+To transform to a bird's-eye-view perspective, we needed to map points roughly corresponding to left and right lane line endpoints to a rectangle vertices. This will stretch/shrink the image such that lane lines farther away in the input image appear in similar scale as nearer lane lines. 
 
 ![alt text][image11]
 
@@ -121,7 +116,7 @@ Here's an example of identified pixels, line-fitted, with search windows
 
 To determine the radius of curvature, we refit our quadratic lines after adjusting pixel position to relative physical distance. Using the equation shown in this [article](http://www.intmath.com/applications-differentiation/8-radius-curvature.php), we calculated the radius of curvature with respect to the base of our detected line. See `GetRadCurvature` function in utils.py
 
-To determine the distance of vehicle relative to lane centre, we took the average of the detected lane lines and compared how many pixels are off compared the image centre. We then convert this measurement to physical distance. Implicit in this operation is the assumption that the camera is mounted in the middle of the car. See `GetOffCentre` function in utils.py
+To determine the distance of vehicle relative to lane centre, we took the average of the detected lane lines and compared how many pixels are off compared to the image centre. We then convert this measurement to physical distance. Implicit in this operation is the assumption that the camera is mounted in the middle of the car. See `GetOffCentre` function in utils.py
 
 #### 7. Highlighting area between lanes
 
@@ -129,7 +124,7 @@ We highlight the area between lanes by filling the polygon specified by the fitt
 
 #### 8. Final output
 
-The produce the final output, the filled area between lanes are warped back to the input image. We also overlay the radius of curvature and distance off vehicle centre to the input image.
+To produce the final output, the filled area between lanes are warped back to the input image. We also overlay the radius of curvature and distance off vehicle centre to the input image.
 
 The final output
 1. [Video](./output_videos/project_video_out.mp4) - Lane lines filled
