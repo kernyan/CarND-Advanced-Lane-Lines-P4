@@ -30,10 +30,10 @@ Outline of the report:
 [image7]:  ./output_images/Magnitude_Threshold.png "MagnitudeThreshold"
 [image8]:  ./output_images/Comparing_S_Filter.png "Comparing S Filter"
 [image9]:  ./output_images/Comparing_Sobelx.png "Comparing Sobelx"
-[image10]:  ./output_images/Isolating2Filters.png "Isolating Filter Components.png"
-[image11]:  ./output_images/Perspective_Transformed.png "Perspective Transformed.png"
-[image12]:  ./output_images/Warped_Lines.png "Warped Lines.png"
-[image13]:  ./output_images/Searched_Lines.png "Searched Lines.png"
+[image10]: ./output_images/Isolating2Filters.png "Isolating Filter Components.png"
+[image11]: ./output_images/Perspective_Transformed.png "Perspective Transformed.png"
+[image12]: ./output_images/Warped_Lines.png "Warped Lines.png"
+[image13]: ./output_images/Searched_Lines.png "Searched Lines.png"
 
 
 #### 1. Introduction
